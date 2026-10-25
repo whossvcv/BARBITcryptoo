@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BARBIT</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700;900&family=Manrope:wght@400;600;700&display=swap">
+<style>
+:root{--bg:#eceef3;--surface:#fff;--ink:#14172b;--muted:#5b6078;--accent:#2d3bff;--accent-ink:#fff;--line:#d3d6e2;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1020;--surface:#171a30;--ink:#eef0fb;--muted:#9aa0bf;--accent:#6c78ff;--accent-ink:#0e1020;--line:#2b2f4d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1020;--surface:#171a30;--ink:#eef0fb;--muted:#9aa0bf;--accent:#6c78ff;--accent-ink:#0e1020;--line:#2b2f4d;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:"Manrope",system-ui,sans-serif;line-height:1.5}
+header{display:flex;align-items:center;gap:14px;padding:16px 20px}
+.burger{width:46px;height:46px;border:2px solid var(--ink);background:var(--surface);border-radius:12px;display:grid;place-content:center;gap:5px;cursor:pointer}
+.burger span{display:block;width:22px;height:3px;background:var(--ink);border-radius:2px}
+.burger:focus-visible,button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.logo{font-family:"Unbounded",Impact,sans-serif;font-weight:900;font-size:22px;letter-spacing:.02em;display:flex;align-items:center;gap:10px}
+.logo i{display:inline-block;width:34px;height:12px;background:var(--accent);border-radius:3px;position:relative}
+.logo i::before,.logo i::after{content:"";position:absolute;top:-6px;width:8px;height:24px;background:var(--ink);border-radius:3px}
+.logo i::before{left:-6px}.logo i::after{right:-6px}
+main{display:grid;place-items:center;padding:24px 20px 60px}
+.card{width:100%;max-width:420px}
+.hero{font-family:"Unbounded",Impact,sans-serif;font-weight:900;font-size:clamp(46px,14vw,84px);line-height:.95;margin:20px 0 8px;letter-spacing:-.02em}
+.sub{color:var(--muted);margin:0 0 28px;max-width:34ch}
+form{background:var(--surface);border:2px solid var(--ink);border-radius:18px;padding:22px;display:grid;gap:14px;box-shadow:6px 6px 0 var(--accent)}
+label{font-weight:700;font-size:14px;display:grid;gap:6px}
+input{font:inherit;padding:13px 14px;border:2px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+input:focus{border-color:var(--accent)}
+.btn{font:inherit;font-weight:700;padding:14px;border:0;border-radius:10px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line)}
+#msg{min-height:1.4em;margin:0;font-size:14px;color:var(--muted)}
+#msg.err{color:#d33a3a}
+.overlay{position:fixed;inset:0;background:rgba(10,12,28,.55);opacity:0;pointer-events:none;transition:opacity .25s;z-index:20}
+.overlay.open{opacity:1;pointer-events:auto}
+aside{position:fixed;top:0;bottom:0;left:0;width:min(320px,86vw);background:var(--surface);border-right:2px solid var(--ink);transform:translateX(-100%);transition:transform .28s ease;z-index:30;padding:calc(20px + env(safe-area-inset-top,0px)) 20px 20px;display:flex;flex-direction:column;gap:6px;overflow-y:auto}
+aside.open{transform:none}
+.drawer-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.close{border:0;background:none;color:var(--ink);font-size:30px;cursor:pointer;line-height:1}
+.item{display:block;width:100%;text-align:left;font:inherit;font-weight:700;font-size:17px;padding:14px 12px;border:0;border-radius:10px;background:none;color:var(--ink);cursor:pointer;text-decoration:none}
+.item:hover{background:var(--bg)}
+.langs{display:none;gap:8px;padding:4px 12px 10px;flex-wrap:wrap}
+.langs.open{display:flex}
+.langs button{font:inherit;font-weight:600;padding:9px 14px;border-radius:999px;border:2px solid var(--line);background:none;color:var(--ink);cursor:pointer}
+.langs button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.modal{position:fixed;inset:0;display:none;place-items:center;z-index:40;padding:20px}
+.modal.open{display:grid}
+.modal .box{background:var(--surface);border:2px solid var(--ink);border-radius:18px;padding:24px;max-width:380px;width:100%;display:grid;gap:12px}
+.modal h2{margin:0;font-family:"Unbounded",sans-serif;font-size:20px}
+.modal p{margin:0;color:var(--muted)}
+.modal a.btn{text-align:center;text-decoration:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="logo"><i></i>BARBIT</div>
+</header>
+
+<div class="overlay" id="overlay"></div>
+<aside id="drawer" aria-hidden="true">
+  <div class="drawer-head"><div class="logo"><i></i>BARBIT</div><button class="close" id="close" aria-label="Close">×</button></div>
+  <a class="item" href="https://t.me/wholotaswagg" target="_blank" rel="noopener" data-i="about">О нас</a>
+  <button class="item" id="settingsBtn" aria-expanded="false" data-i="settings">Настройки</button>
+  <div class="langs" id="langs">
+    <button data-lang="ru" aria-pressed="true">Русский</button>
+    <button data-lang="uk" aria-pressed="false">Українська</button>
+    <button data-lang="en" aria-pressed="false">English</button>
+  </div>
+  <button class="item" id="supportBtn" data-i="support">Поддержка</button>
+</aside>
+
+<main>
+  <div class="card">
+    <h1 class="hero">BARBIT</h1>
+    <p class="sub" data-i="tagline">Войдите или создайте аккаунт, указав почту и пароль.</p>
+    <form id="form" novalidate>
+      <label><span data-i="email">Электронная почта</span>
+        <input type="email" id="email" autocomplete="email" placeholder="name@example.com" required></label>
+      <label><span data-i="password">Пароль</span>
+        <input type="password" id="password" autocomplete="current-password" minlength="6" required></label>
+      <button class="btn" type="submit" data-i="submit">Продолжить</button>
+      <p id="msg" role="status"></p>
+    </form>
+  </div>
+</main>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="box">
+    <h2 id="mTitle" data-i="supportTitle">Поддержка</h2>
+    <p data-i="supportText">Напишите нам в Telegram — аккаунт @wholotaswagg. Перейти?</p>
+    <a class="btn" href="https://t.me/wholotaswagg" target="_blank" rel="noopener" data-i="go">Перейти в Telegram</a>
+    <button class="btn ghost" id="mClose" data-i="cancel">Отмена</button>
+  </div>
+</div>
+
+<script>
+var T={
+ru:{about:"О нас",settings:"Настройки",support:"Поддержка",tagline:"Войдите или создайте аккаунт, указав почту и пароль.",email:"Электронная почта",password:"Пароль",submit:"Продолжить",supportTitle:"Поддержка",supportText:"Напишите нам в Telegram — аккаунт @wholotaswagg. Перейти?",go:"Перейти в Telegram",cancel:"Отмена",badEmail:"Введите корректную почту.",badPass:"Пароль — минимум 6 символов.",ok:"Готово. Это демо-форма: данные никуда не отправляются."},
+uk:{about:"Про нас",settings:"Налаштування",support:"Підтримка",tagline:"Увійдіть або створіть акаунт, вказавши пошту та пароль.",email:"Електронна пошта",password:"Пароль",submit:"Продовжити",supportTitle:"Підтримка",supportText:"Напишіть нам у Telegram — акаунт @wholotaswagg. Перейти?",go:"Перейти в Telegram",cancel:"Скасувати",badEmail:"Введіть коректну пошту.",badPass:"Пароль — щонайменше 6 символів.",ok:"Готово. Це демо-форма: дані нікуди не надсилаються."},
+en:{about:"About us",settings:"Settings",support:"Support",tagline:"Sign in or create an account with your email and password.",email:"Email",password:"Password",submit:"Continue",supportTitle:"Support",supportText:"Message us on Telegram — account @wholotaswagg. Open it?",go:"Open Telegram",cancel:"Cancel",badEmail:"Enter a valid email.",badPass:"Password must be at least 6 characters.",ok:"Done. This is a demo form: nothing is sent anywhere."}
+};
+var lang="ru";
+try{var s=localStorage.getItem("barbit-lang");if(s&&T[s])lang=s}catch(e){}
+function apply(l){
+  lang=l;document.documentElement.lang=l;
+  document.querySelectorAll("[data-i]").forEach(function(el){el.textContent=T[l][el.dataset.i]});
+  document.querySelectorAll("#langs button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.lang===l)});
+  try{localStorage.setItem("barbit-lang",l)}catch(e){}
+}
+var drawer=document.getElementById("drawer"),overlay=document.getElementById("overlay"),burger=document.getElementById("burger");
+function openDrawer(o){drawer.classList.toggle("open",o);overlay.classList.toggle("open",o);burger.setAttribute("aria-expanded",o);drawer.setAttribute("aria-hidden",!o)}
+burger.onclick=function(){openDrawer(true)};
+document.getElementById("close").onclick=overlay.onclick=function(){openDrawer(false)};
+document.getElementById("settingsBtn").onclick=function(){
+  var l=document.getElementById("langs"),o=!l.classList.contains("open");
+  l.classList.toggle("open",o);this.setAttribute("aria-expanded",o)};
+document.querySelectorAll("#langs button").forEach(function(b){b.onclick=function(){apply(b.dataset.lang)}});
+var modal=document.getElementById("modal");
+document.getElementById("supportBtn").onclick=function(){openDrawer(false);modal.classList.add("open")};
+document.getElementById("mClose").onclick=function(){modal.classList.remove("open")};
+modal.onclick=function(e){if(e.target===modal)modal.classList.remove("open")};
+document.addEventListener("keydown",function(e){if(e.key==="Escape"){openDrawer(false);modal.classList.remove("open")}});
+document.getElementById("form").onsubmit=function(e){
+  e.preventDefault();
+  var m=document.getElementById("msg"),em=document.getElementById("email").value.trim(),pw=document.getElementById("password").value;
+  m.className="";
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){m.className="err";m.textContent=T[lang].badEmail;return}
+  if(pw.length<6){m.className="err";m.textContent=T[lang].badPass;return}
+  m.textContent=T[lang].ok;
+};
+apply(lang);
+</script>
+</body>
+</html>
